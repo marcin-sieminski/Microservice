@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{29DA174B-6826-46CA-BC9F-BA23B23F8775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{29DA174B-6826-46CA-BC9F-BA23B23F8775}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarking", "Benchmarking\Benchmarking.csproj", "{A4959101-18BD-4E3B-BF98-91A092B46CDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{29DA174B-6826-46CA-BC9F-BA23B23F8775}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29DA174B-6826-46CA-BC9F-BA23B23F8775}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29DA174B-6826-46CA-BC9F-BA23B23F8775}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4959101-18BD-4E3B-BF98-91A092B46CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4959101-18BD-4E3B-BF98-91A092B46CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4959101-18BD-4E3B-BF98-91A092B46CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4959101-18BD-4E3B-BF98-91A092B46CDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
