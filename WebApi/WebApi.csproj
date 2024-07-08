@@ -7,16 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Model\Item.cs" />
-    <Compile Remove="Model\ItemDto.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Model\ItemDto.cs" />
-    <None Include="Model\Item.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
   </ItemGroup>

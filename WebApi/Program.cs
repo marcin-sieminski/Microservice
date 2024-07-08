@@ -1,8 +1,7 @@
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
 using WebApi.Entity;
+using WebApi.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +14,8 @@ var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connection)
     Password = Environment.GetEnvironmentVariable("ITEMS_DB_PASSWORD")
 };
 builder.Services.AddDbContext<ItemContext>(options => options.UseNpgsql(connectionStringBuilder.ConnectionString));
+
+builder.Services.AddAutoMapper(typeof(ItemMappingProfile));
 
 var app = builder.Build();
 
