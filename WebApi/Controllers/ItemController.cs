@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using DataAccess;
+using DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Entity;
-using WebApi.Model;
+using Microsoft.EntityFrameworkCore;
+using Services.Models;
 
 namespace WebApi.Controllers;
 
@@ -10,22 +12,22 @@ namespace WebApi.Controllers;
 public class ItemController(ItemContext dbContext, IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<Item>> GetAll()
+    public async Task<ActionResult<IEnumerable<ItemModel>>> GetAll()
     {
-        var itemsDb = dbContext.Items.ToList();
-        var itemsDto = mapper.Map<List<ItemDto>>(itemsDb);
+        var itemsDb = await dbContext.Items.ToListAsync();
+        var itemsDto = mapper.Map<List<ItemModel>>(itemsDb);
         return Ok(itemsDto);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Item> Get(int id)
+    public async Task<ActionResult<Item>> Get(int id)
     {
-        var itemDb = dbContext.Items.FirstOrDefault(x => x.Id == id);
+        var itemDb = await dbContext.Items.FirstOrDefaultAsync(x => x.Id == id);
         if (itemDb is null)
         {
             return NotFound();
         }
-        var item = mapper.Map<ItemDto>(itemDb);
+        var item = mapper.Map<ItemModel>(itemDb);
         return Ok(item);
     }
 }

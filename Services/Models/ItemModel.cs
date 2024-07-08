@@ -1,6 +1,6 @@
-﻿namespace WebApi.Model;
+﻿namespace Services.Models;
 
-public class ItemDto
+public class ItemModel
 {
 	public int Id { get; set; }
 	public string Name { get; set; }

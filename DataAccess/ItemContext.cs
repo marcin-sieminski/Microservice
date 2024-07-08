@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace WebApi.Entity;
+namespace DataAccess;
 
 public class ItemContext(DbContextOptions<ItemContext> options) : DbContext(options)
 {
     public DbSet<Item> Items { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Item>().ToTable("items");
