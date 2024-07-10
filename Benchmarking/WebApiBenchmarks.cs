@@ -12,7 +12,7 @@ public class WebApiBenchmarks
     };
 
     [Benchmark]
-    public async Task GetBenchmark()
+    public async Task GetFullBenchmark()
     {
         using HttpResponseMessage response = await httpClient.GetAsync("item");
         response.EnsureSuccessStatusCode();

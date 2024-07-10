@@ -16,6 +16,7 @@ builder.Services.AddAutoMapper(typeof(ItemMappingProfile));
 
 var app = builder.Build();
 
-app.MapGets();
+app.MapGets()
+   .MapPosts();
 
 app.Run();

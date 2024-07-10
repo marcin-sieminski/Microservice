@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess;
+using DataAccess.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Services.Models;
@@ -13,7 +14,7 @@ public static class WebApplicationExtensions
     {
         app.MapGet("/", () => "Hello World!").ExcludeFromDescription();
 
-        app.MapGet("/item", async Task<Results<Ok<IEnumerable<ItemModel>>, NotFound>> ([FromServices] ItemContext dbContext, IMapper mapper) =>
+        app.MapGet("item", async Task<Results<Ok<IEnumerable<ItemModel>>, NotFound>> ([FromServices] ItemContext dbContext, IMapper mapper) =>
         {
             var itemsDb = await dbContext.Items.ToListAsync();
             if (!itemsDb.Any())
@@ -25,7 +26,7 @@ public static class WebApplicationExtensions
         })
         .WithName("GetItems")
         .Produces<IEnumerable<ItemModel>>();
-        
+
         app.MapGet("/item/{id:int}", async Task<Results<Ok<ItemModel>, NotFound>> ([FromServices] ItemContext dbContext, IMapper mapper, [FromRoute] int id) =>
         {
             var itemDb = await dbContext.Items.FirstOrDefaultAsync(x => x.Id == id);
@@ -39,6 +40,20 @@ public static class WebApplicationExtensions
         .WithName("GetItemById")
         .Produces<IEnumerable<ItemModel>>()
         .Produces(StatusCodes.Status404NotFound);
+
+        return app;
+    }
+
+    public static WebApplication MapPosts(this WebApplication app)
+    {
+        app.MapPost("item", async ([FromBody] ItemModel item, [FromServices] ItemContext dbContext, IMapper mapper) =>
+        {
+            var itemDb = mapper.Map<Item>(item);
+            dbContext.Items.Add(itemDb);
+            await dbContext.SaveChangesAsync();
+            return Results.Created($"item/{item.Id}", item);
+        })
+          .Produces<ItemModel>(StatusCodes.Status201Created);
 
         return app;
     }
