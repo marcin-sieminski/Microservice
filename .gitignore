@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 *.http
+launchSettings.json
