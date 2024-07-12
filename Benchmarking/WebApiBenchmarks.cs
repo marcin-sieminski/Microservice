@@ -14,7 +14,7 @@ public class WebApiBenchmarks
     [Benchmark]
     public async Task GetFullBenchmark()
     {
-        using HttpResponseMessage response = await httpClient.GetAsync("item");
+        using HttpResponseMessage response = await httpClient.GetAsync("items");
         response.EnsureSuccessStatusCode();
         var jsonResponse = await response.Content.ReadAsStringAsync();
     }
