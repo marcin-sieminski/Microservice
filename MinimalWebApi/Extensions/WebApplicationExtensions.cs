@@ -66,8 +66,7 @@ public static class WebApplicationExtensions
         app.MapPut("/items/{id:int}", async (
                 [FromRoute] int id,
                 [FromBody] ItemModel item,
-                ItemContext dbContext,
-                IMapper mapper) =>
+                ItemContext dbContext) =>
         {
             Item? foundItem = await dbContext.Items.FindAsync(id);
             if (foundItem is null) return Results.NotFound();
@@ -75,6 +74,25 @@ public static class WebApplicationExtensions
             foundItem.Description = item.Description;
             await dbContext.SaveChangesAsync();
             return Results.NoContent();
+        })
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status204NoContent);
+        return app;
+    }
+
+    public static WebApplication MapDeletes(this WebApplication app)
+    {
+        app.MapDelete("items/{id:int}", async (
+                [FromRoute] int id, 
+                ItemContext dbContext) =>
+        {
+            if (await dbContext.Items.FindAsync(id) is Item item)
+            {
+                dbContext.Items.Remove(item);
+                await dbContext.SaveChangesAsync();
+                return Results.NoContent();
+            }
+            return Results.NotFound();
         })
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status204NoContent);
