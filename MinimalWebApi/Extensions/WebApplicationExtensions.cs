@@ -24,7 +24,7 @@ public static class WebApplicationExtensions
             var items = mapper.Map<IEnumerable<ItemModel>>(itemsEntity);
             return TypedResults.Ok(items);
         })
-        .WithName("Items")
+        .WithName("items")
         .Produces<IEnumerable<ItemModel>>();
 
         app.MapGet("/items/{id:int}", async Task<Results<Ok<ItemModel>, NotFound>> ([FromServices] ItemContext dbContext, IMapper mapper, [FromRoute] int id) =>
@@ -37,7 +37,7 @@ public static class WebApplicationExtensions
             var item = mapper.Map<ItemModel>(itemEntity);
             return TypedResults.Ok(item);
         })
-        .WithName("Item")
+        .WithName("items")
         .Produces<IEnumerable<ItemModel>>()
         .Produces(StatusCodes.Status404NotFound);
 
@@ -55,7 +55,8 @@ public static class WebApplicationExtensions
             await dbContext.SaveChangesAsync();
             return Results.Created($"items/{item.Id}", mapper.Map<ItemModel>(itemEntity));
         })
-        .WithName("Item")
+        .WithName("items")
+        .Accepts<ItemModel>("application/json")
         .Produces<ItemModel>(StatusCodes.Status201Created);
 
         return app;
@@ -75,6 +76,8 @@ public static class WebApplicationExtensions
             await dbContext.SaveChangesAsync();
             return Results.NoContent();
         })
+        .WithName("items")
+        .Accepts<ItemModel>("application/json")
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status204NoContent);
         return app;
@@ -83,7 +86,7 @@ public static class WebApplicationExtensions
     public static WebApplication MapDeletes(this WebApplication app)
     {
         app.MapDelete("items/{id:int}", async (
-                [FromRoute] int id, 
+                [FromRoute] int id,
                 ItemContext dbContext) =>
         {
             if (await dbContext.Items.FindAsync(id) is Item item)
@@ -94,6 +97,7 @@ public static class WebApplicationExtensions
             }
             return Results.NotFound();
         })
+        .WithName("items")
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status204NoContent);
         return app;
