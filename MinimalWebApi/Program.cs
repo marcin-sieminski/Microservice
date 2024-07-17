@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MinimalWebApi.Extensions;
 using Npgsql;
 using Services.Mappings;
+using Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<ItemContext>(options => options.UseNpgsql(new Npgs
 }.ConnectionString));
 
 builder.Services.AddAutoMapper(typeof(ItemMappingProfile));
+builder.Services.AddScoped<IItemService, ItemService>();
 
 var app = builder.Build();
 
