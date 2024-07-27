@@ -9,10 +9,10 @@ public static class WebApplicationExtensions
 {
     public static WebApplication MapGets(this WebApplication app)
     {
-        app.MapGet("/", () => "Hello World!").ExcludeFromDescription();
+        app.MapGet("", () => "Hello World!!").ExcludeFromDescription();
 
         app.MapGet("items", async Task<Results<Ok<List<ItemModel>>, NotFound>> (
-            [FromServices] ItemService service) =>
+            [FromServices] IItemService service) =>
             {
                 var items = await service.GetAll();
                 if (!items.Any())
@@ -21,11 +21,11 @@ public static class WebApplicationExtensions
                 }
                 return TypedResults.Ok(items);
             })
-        .WithName("items")
+        .WithName("get items")
         .Produces<IEnumerable<ItemModel>>();
 
-        app.MapGet("/items/{id:int}", async Task<Results<Ok<ItemModel>, NotFound>> (
-                [FromServices] ItemService service,
+        app.MapGet("items/{id:int}", async Task<Results<Ok<ItemModel>, NotFound>> (
+                [FromServices] IItemService service,
                 [FromRoute] int id) =>
                 {
                     var item = await service.GetById(id);
@@ -35,7 +35,7 @@ public static class WebApplicationExtensions
                     }
                     return TypedResults.Ok(item);
                 })
-        .WithName("items")
+        .WithName("get item")
         .Produces<IEnumerable<ItemModel>>()
         .Produces(StatusCodes.Status404NotFound);
 
@@ -46,12 +46,12 @@ public static class WebApplicationExtensions
     {
         app.MapPost("items", async (
                 [FromBody] ItemModel newItem,
-                [FromServices] ItemService service) =>
+                [FromServices] IItemService service) =>
                 {
                     var item = await service.Create(newItem);
                     return item is null ? TypedResults.BadRequest() : Results.Created($"items/{item.Id}", item);
                 })
-        .WithName("items")
+        .WithName("create item")
         .Accepts<ItemModel>("application/json")
         .Produces<ItemModel>(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest);
@@ -61,15 +61,15 @@ public static class WebApplicationExtensions
 
     public static WebApplication MapPuts(this WebApplication app)
     {
-        app.MapPut("/items/{id:int}", async (
+        app.MapPut("items/{id:int}", async (
                 [FromRoute] int id,
                 [FromBody] ItemModel updateItem,
-                ItemService service) =>
+                IItemService service) =>
                 {
                     var item = await service.Update(id, updateItem);
                     return item is null ? Results.NotFound() : Results.NoContent();
                 })
-        .WithName("items")
+        .WithName("update item")
         .Accepts<ItemModel>("application/json")
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status204NoContent);
@@ -80,7 +80,7 @@ public static class WebApplicationExtensions
     {
         app.MapDelete("items/{id:int}", async (
                 [FromRoute] int id,
-                ItemService service) =>
+                IItemService service) =>
                 {
                     if (await service.Delete(id))
                     {
@@ -88,7 +88,7 @@ public static class WebApplicationExtensions
                     }
                     return Results.NotFound();
                 })
-        .WithName("items")
+        .WithName("delete item")
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status204NoContent);
         return app;
