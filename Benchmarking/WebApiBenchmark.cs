@@ -4,17 +4,17 @@ namespace Benchmarking;
 
 [MemoryDiagnoser]
 [ThreadingDiagnoser]
-public class WebApiBenchmarks
+public class WebApiBenchmark
 {
-    private static HttpClient httpClient = new()
+    private static readonly HttpClient _httpClient = new()
     {
-        BaseAddress = new Uri("http://localhost:5198"),
+        BaseAddress = new Uri("http://localhost:5230"),
     };
 
     [Benchmark]
     public async Task GetFullBenchmark()
     {
-        using HttpResponseMessage response = await httpClient.GetAsync("items");
+        using HttpResponseMessage response = await _httpClient.GetAsync("items");
         response.EnsureSuccessStatusCode();
         var jsonResponse = await response.Content.ReadAsStringAsync();
     }

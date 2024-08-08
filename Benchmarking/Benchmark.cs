@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Running;
 using Benchmarking;
 
-BenchmarkRunner.Run<WebApiBenchmarks>();
+BenchmarkRunner.Run<HttpServerBenchmark.Benchmark>();
+BenchmarkRunner.Run<WebApiBenchmark>();

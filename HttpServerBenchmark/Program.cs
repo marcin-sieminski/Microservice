@@ -3,84 +3,24 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HttpServerBenchmark;
 
-static class Program
+public static class Program
 {
-    private static readonly HttpClient s_client = new HttpClient() { Timeout = TimeSpan.FromSeconds(1) };
-
     static Program()
     {
         ServicePointManager.ReusePort = true;
         ServicePointManager.DefaultConnectionLimit = 12 * Environment.ProcessorCount;
         ServicePointManager.UseNagleAlgorithm = false;
     }
-
     public static async Task Main(string[] args)
     {
-        int n;
-        if (args.Length < 1 || !int.TryParse(args[0], out n))
-        {
-            n = 10;
-        }
-
-        var port = 30000 + new Random().Next(10000);
-        var server = CreateWebHostBuilder(port).Build();
-        using var cts = new CancellationTokenSource();
-        _ = Task.Factory.StartNew(() => server.Start(), TaskCreationOptions.LongRunning);
-        var sum = 0;
-        var api = $"http://localhost:{port}/";
-        var tasks = new List<Task<int>>(n);
-        for (var i = 1; i <= n; i++)
-        {
-            tasks.Add(SendAsync(api, i));
-        }
-        foreach (var task in tasks)
-        {
-            sum += await task.ConfigureAwait(false);
-        }
-        Console.WriteLine(sum);
+        await new Benchmark().Run();
         System.Environment.Exit(0);
     }
-
-    private static async Task<int> SendAsync(string api, int value)
-    {
-        var payload = JsonSerializer.Serialize(new Payload { Value = value });
-        while (true)
-        {
-            try
-            {
-                var content = new StringContent(payload, Encoding.UTF8);
-                var response = await s_client.PostAsync(api, content).ConfigureAwait(false);
-                return int.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-            }
-            catch { }
-        }
-    }
-
-    private static IHostBuilder CreateWebHostBuilder(int port) =>
-         Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.AddJsonFile("appsettings.json",
-                    optional: true,
-                    reloadOnChange: false);
-            })
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.SuppressStatusMessages(true).ConfigureLogging((context, logging) =>
-                {
-                    logging.ClearProviders();
-                })
-                .UseKestrel(options =>
-                {
-                    options.Limits.MaxRequestBodySize = null;
-                    options.ListenLocalhost(port);
-                })
-                .UseStartup<Startup>();
-            });
 }
 
 public sealed class MyController : Controller
@@ -124,5 +64,75 @@ public sealed class Startup
         {
             endpoints.MapControllers();
         });
+    }
+}
+
+public class Benchmark
+{
+    private static readonly HttpClient s_client = new HttpClient() { Timeout = TimeSpan.FromSeconds(1) };
+
+    [Benchmark]
+    public async Task Run()
+    {
+        const int samplesCount = 500;
+
+        var port = 30000 + new Random().Next(10000);
+        var server = CreateWebHostBuilder(port).Build();
+        using var cts = new CancellationTokenSource();
+        _ = Task.Factory.StartNew(() => server.Start(), TaskCreationOptions.LongRunning);
+        var sum = 0;
+        var api = $"http://localhost:{port}/";
+        var tasks = new List<Task<int>>(samplesCount);
+        for (var i = 1; i <= samplesCount; i++)
+        {
+            tasks.Add(SendAsync(api, i));
+        }
+        foreach (var task in tasks)
+        {
+            sum += await task.ConfigureAwait(false);
+        }
+
+        Console.WriteLine(sum);
+        var result = sum;
+    }
+
+    private static IHostBuilder CreateWebHostBuilder(int port) =>
+        Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.AddJsonFile("appsettings.json",
+                    optional: true,
+                    reloadOnChange: false);
+            })
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.SuppressStatusMessages(true).ConfigureLogging((context, logging) =>
+                    {
+                        logging.ClearProviders();
+                    })
+                    .UseKestrel(options =>
+                    {
+                        options.Limits.MaxRequestBodySize = null;
+                        options.ListenLocalhost(port);
+                    })
+                    .UseStartup<Startup>();
+            });
+
+    private static async Task<int> SendAsync(string api, int value)
+    {
+        var payload = JsonSerializer.Serialize(new Payload { Value = value });
+        while (true)
+        {
+            try
+            {
+                var content = new StringContent(payload, Encoding.UTF8);
+                var response = await s_client.PostAsync(api, content).ConfigureAwait(false);
+                return int.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+            }
+            catch
+            {
+                
+            }
+        }
     }
 }
