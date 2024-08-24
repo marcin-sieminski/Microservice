@@ -93,7 +93,7 @@ public class Benchmark
         }
 
         Console.WriteLine(sum);
-        var result = sum;
+        Environment.ExitCode(0);
     }
 
     private static IHostBuilder CreateWebHostBuilder(int port) =>
